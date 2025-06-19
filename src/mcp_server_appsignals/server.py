@@ -73,7 +73,9 @@ async def list_monitored_services() -> str:
     - Service name and type
     - Key attributes (Environment, Platform, etc.)
     - Total count of services
-
+    - List of Attribute Map. Each map can contain one of the following information
+        - Platform Details
+        - Code language
     This is typically the first tool to use when starting monitoring or investigation."""
     start_time_perf = timer()
     logger.info("Starting list_application_signals_services request")
@@ -180,9 +182,7 @@ async def get_service_detail(service_name: str) -> str:
 
         # Get detailed service information
         logger.debug(f"Getting detailed information for service: {service_name}")
-        service_response = appsignals.get_service(
-            StartTime=start_time, EndTime=end_time, KeyAttributes=target_service["KeyAttributes"]
-        )
+        service_response = target_service
 
         service_details = service_response["Service"]
 
@@ -1040,6 +1040,7 @@ async def query_sampled_traces(
     - 'http.status = 500': Find specific HTTP status codes
     - 'annotation[aws.local.operation]="GET /owners/*/lastname"': Filter by specific operation (from metric dimensions)
     - 'annotation[aws.remote.operation]="ListOwners"': Filter by remote operation name
+    - Combine filters: '(annotation[aws:aws.local.resource.identifier]="abc") AND (error = true OR fault = true)'
     - Combine filters: 'service("api"){fault = true} AND annotation[aws.local.operation]="POST /visits"'
 
     IMPORTANT: When investigating SLO breaches, use annotation filters with the specific dimension values
